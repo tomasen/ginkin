@@ -4,10 +4,15 @@ Build command line interface and http api server at the same time by mix Gin and
 
 ## Example
 
+By following example. 
+
+- `go run main.go` will start http api server handle requests to "http://:3000/version".
+- `go run main.go version` will print out version info directly.
+
 ```go
 func main() {
     apis := ginkin.APIHandlers{
-      "version": {"GET", DescribeVersion, "print version ifno"},
+      "version": {"GET", DescribeVersion, "print version info"},
     }
     
     // prepare gin engine
@@ -22,6 +27,10 @@ func main() {
         CLIFallbackFunc: CLIFallback,
     }
     gk.Run(router, "/")
+}
+
+func DescribeVersion(c *gin.Context) {
+	c.JSON(http.StatusOK, "0.1")
 }
 
 func ServeGin(router *gin.Engine) {
