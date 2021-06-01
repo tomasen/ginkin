@@ -1,6 +1,6 @@
 # ginkin
 
-Build command line interface and http api server at the same time by mix Gin and Kingpin.
+Setup HTTP API server and command-line interface at the same time by mix Gin and Kingpin.
 
 ## Example
 
@@ -8,11 +8,17 @@ By following example.
 
 - `go run main.go` will start http api server handle requests to "http://:3000/version".
 - `go run main.go version` will print out version info directly.
+- `go run main.go user/list` will print out user list.
+- `go run main.go user/:user john` will print out user list.
+- `go run main.go user/add "['jane']"` will add users.
 
 ```go
 func main() {
     apis := ginkin.APIHandlers{
-      "version": {"GET", DescribeVersion, "print version info"},
+    	"version":    {"GET", DescribeVersion, "print version info"}, 
+    	"user/list":  {"POST", UserList, "print version info"},
+        "user/:user": {"GET", DescribeUser, "print user info"}, 
+        "user/add":   {"PUT", AssUsers, "add users"},
     }
     
     // prepare gin engine
@@ -27,6 +33,30 @@ func main() {
         CLIFallbackFunc: CLIFallback,
     }
     gk.Run(router, "/")
+}
+
+func UserList(c *gin.Context) {
+    c.JSON(http.StatusOK, "john")
+}
+
+func DescribeUser(c *gin.Context) {
+	user, exist := c.Params.Get("user")
+	if !exist {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+    c.JSON(http.StatusOK, user)
+}
+
+func AssUsers(c *gin.Context) {
+	var users []string
+	if err := c.ShouldBindJSON(&users); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	
+	c.JSON(http.StatusOK, users)
 }
 
 func DescribeVersion(c *gin.Context) {
