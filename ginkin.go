@@ -36,11 +36,11 @@ var UnderCommandLine bool
 func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin.HandlerFunc)  {
 	kingpin.Command("start/server", "").Default()
 
-	v1api := router.Group(relativePath)
-	v1api.Use(middleware...)
+	apiGroup := router.Group(relativePath)
+	apiGroup.Use(middleware...)
 	payloads := map[string]*string{}
 	for cmd, v := range gk.APIHandlers {
-		v1api.Handle(v.HTTPMethod, relativePath + cmd, v.Handler)
+		apiGroup.Handle(v.HTTPMethod, cmd, v.Handler)
 		c := kingpin.Command(cmd, v.Help)
 		payloads[cmd] = c.Arg("payload", "").Default("").String()
 	}
