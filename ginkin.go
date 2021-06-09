@@ -19,14 +19,10 @@ type APIHandler struct {
 	Help        string
 }
 
-type APIHandlers map[string]APIHandler
-type ServeGinFunc func(engine *gin.Engine)
-type CLIFallbackFunc func(cmd string)
-
 type GinKin struct {
-	APIHandlers
-	ServeGinFunc
-	CLIFallbackFunc
+	APIHandlers		map[string]APIHandler
+	ServeGinFunc 	func(engine *gin.Engine)
+	CLIFallbackFunc func(cmd string)
 }
 
 var UnderCommandLine bool
