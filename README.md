@@ -12,3 +12,4 @@ directly or start server by default:
 - `go run main.go user/list` will print out user list.
 - `go run main.go user/:user john` will print out user list.
 - `go run main.go user/add "['jane']"` will add users.
+- `go run main.go user/:user#del john` will del user.

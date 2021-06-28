@@ -10,10 +10,11 @@ import (
 
 func main() {
 	apis := map[string]ginkin.APIHandler{
-		"version":    {"GET", DescribeVersion, "print version info"},
-		"user/list":  {"POST", UserList, "list users"},
-		"user/:user": {"GET", DescribeUser, "print user info"},
-		"user/add":   {"PUT", AddUsers, "add users"},
+		"version":        {"GET", DescribeVersion, "print version info"},
+		"user/list":      {"POST", UserList, "list users"},
+		"user/:user":     {"GET", DescribeUser, "print user info"},
+		"user/:user#del": {"DELETE", DeleteUser, "print user info"},
+		"user/add":       {"PUT", AddUsers, "add users"},
 	}
 
 	// prepare gin engine
@@ -54,6 +55,13 @@ func AddUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
+func DeleteUser(c  *gin.Context) {
+	user, _ := c.Params.Get("user")
+
+	log.Println("deleting:", user)
+	c.Status(http.StatusOK)
+}
+
 func DescribeVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "0.1")
 }
@@ -65,4 +73,3 @@ func ServeGin(router *gin.Engine) {
 func CLIFallback(cmd string) {
 	log.Println("handled command line action:", cmd)
 }
-

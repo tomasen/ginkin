@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"strings"
 )
 
 type APIHandler struct {
@@ -36,7 +37,8 @@ func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin
 	apiGroup.Use(middleware...)
 	payloads := map[string]*string{}
 	for cmd, v := range gk.APIHandlers {
-		apiGroup.Handle(v.HTTPMethod, cmd, v.Handler)
+		stripedPath := strings.Split(cmd, "#")[0]
+		apiGroup.Handle(v.HTTPMethod, stripedPath, v.Handler)
 		c := kingpin.Command(cmd, v.Help)
 		payloads[cmd] = c.Arg("payload", "").Default("").String()
 	}
@@ -82,9 +84,13 @@ func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin
 
 		// pretty print response
 		dst := &bytes.Buffer{}
-		if err := json.Indent(dst, w.Body.Bytes(), "", "  "); err != nil {
-			log.Println("json.Indent error:", err)
-			fmt.Println(w.Body.String())
+		body := w.Body.Bytes()
+		if len(body) == 0 {
+			fmt.Println("status:", w.Code)
+			return
+		}
+		if err := json.Indent(dst, body, "", "  "); err != nil {
+			fmt.Println("output:", string(body))
 			return
 		}
 
