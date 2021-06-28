@@ -24,9 +24,9 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 
 	gk := &ginkin.GinKin{
-		APIHandlers:     apis,
-		ServeGinFunc:    ServeGin,
-		CLIFallbackFunc: CLIFallback,
+		APIHandlers:    apis,
+		ListenAndServe: ServeGin,
+		Fallback:       CLIFallback,
 	}
 	gk.Run(router, "/")
 }
@@ -55,7 +55,7 @@ func AddUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func DeleteUser(c  *gin.Context) {
+func DeleteUser(c *gin.Context) {
 	user, _ := c.Params.Get("user")
 
 	log.Println("deleting:", user)

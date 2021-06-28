@@ -15,17 +15,29 @@ import (
 )
 
 type APIHandler struct {
+	// `GET`, `POST`, `DELETE`, `PUT`, etc.
 	HTTPMethod  string
+
+	// defines the handler used by gin
 	Handler     gin.HandlerFunc
+
+	// command-line usage information
 	Help        string
 }
 
 type GinKin struct {
+	// APIHandlers is a list of API interfaces and command-line actions.
 	APIHandlers		map[string]APIHandler
-	ServeGinFunc 	func(engine *gin.Engine)
-	CLIFallbackFunc func(cmd string)
+
+	// ListenAndServe should specify how Gin router to be attached to http Server.
+	// eg. `router.Run()`, or `autotls.Run(router, "example1.com", "example2.com")`, etc,
+	ListenAndServe 	func(router *gin.Engine)
+
+	// Fallback provides a place handle command-line actions that are not in the APIHandlers
+	Fallback        func(cmd string)
 }
 
+// indicate if current process is running under command-line
 var UnderCommandLine bool
 
 // Run Gin Server or process command line
@@ -47,15 +59,15 @@ func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin
 	switch cmd {
 	case "start/server":
 		// start gin server
-		gk.ServeGinFunc(router)
+		gk.ListenAndServe(router)
 	default:
 		// process command line
 		UnderCommandLine = true
 
 		handler, exist := gk.APIHandlers[cmd]
 		if !exist {
-			if gk.CLIFallbackFunc != nil {
-				gk.CLIFallbackFunc(cmd)
+			if gk.Fallback != nil {
+				gk.Fallback(cmd)
 			} else {
 				log.Println("unhandled the command line action:", cmd)
 			}
