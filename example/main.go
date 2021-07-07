@@ -71,5 +71,5 @@ func ServeGin(router *gin.Engine) {
 }
 
 func CLIFallback(cmd string) {
-	log.Println("handled command line action:", cmd)
+	log.Println("unhandled command line action:", cmd)
 }

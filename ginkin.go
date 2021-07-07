@@ -29,8 +29,8 @@ type GinKin struct {
 	// APIHandlers is a list of API interfaces and command-line actions.
 	APIs map[string]APIHandler
 
-	// Start should specify how Gin router start or to be attached to http Server.
-	// eg. `router.Run()`, or `autotls.Run(router, "example1.com", "example2.com")`, etc,
+	// Start should specifies how Gin router starts or to be attached to http Server.
+	// eg. `router.Run()`, or `autotls.Run(router, "example1.com", "example2.com")`, etc.
 	Start func(router *gin.Engine)
 
 	// Fallback provides a place handle command-line actions that are not in the APIHandlers
