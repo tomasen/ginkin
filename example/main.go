@@ -5,7 +5,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 	"net/http"
-	"uplinks/agent/ginkin"
+	"github.com/tomasen/ginkin"
 )
 
 func main() {

@@ -37,7 +37,7 @@ type GinKin struct {
 	Fallback        func(cmd string)
 }
 
-// indicate if current process is running under command-line
+// UnderCommandLine indicate if current process is running under command-line
 var UnderCommandLine bool
 
 // Run Gin Server or process command line
