@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/tomasen/ginkin"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 	"net/http"
-	"github.com/tomasen/ginkin"
 )
 
 func main() {
@@ -24,9 +24,9 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 
 	gk := &ginkin.GinKin{
-		APIHandlers:    apis,
-		ListenAndServe: ServeGin,
-		Fallback:       CLIFallback,
+		APIs:     apis,
+		Start:    ServeGin,
+		Fallback: CLIFallback,
 	}
 	gk.Run(router, "/")
 }

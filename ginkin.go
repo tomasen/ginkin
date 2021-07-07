@@ -16,25 +16,25 @@ import (
 
 type APIHandler struct {
 	// `GET`, `POST`, `DELETE`, `PUT`, etc.
-	HTTPMethod  string
+	HTTPMethod string
 
 	// defines the handler used by gin
-	Handler     gin.HandlerFunc
+	Handler gin.HandlerFunc
 
 	// command-line usage information
-	Help        string
+	Help string
 }
 
 type GinKin struct {
 	// APIHandlers is a list of API interfaces and command-line actions.
-	APIHandlers		map[string]APIHandler
+	APIs map[string]APIHandler
 
-	// ListenAndServe should specify how Gin router to be attached to http Server.
+	// Start should specify how Gin router start or to be attached to http Server.
 	// eg. `router.Run()`, or `autotls.Run(router, "example1.com", "example2.com")`, etc,
-	ListenAndServe 	func(router *gin.Engine)
+	Start func(router *gin.Engine)
 
 	// Fallback provides a place handle command-line actions that are not in the APIHandlers
-	Fallback        func(cmd string)
+	Fallback func(cmd string)
 }
 
 // UnderCommandLine indicate if current process is running under command-line
@@ -42,29 +42,29 @@ var UnderCommandLine bool
 
 // Run Gin Server or process command line
 // relativePath should end with "/"
-func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin.HandlerFunc)  {
+func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin.HandlerFunc) {
 	kingpin.Command("start/server", "").Default()
 
 	apiGroup := router.Group(relativePath)
 	apiGroup.Use(middleware...)
 	payloads := map[string]*string{}
-	for cmd, v := range gk.APIHandlers {
+	for cmd, v := range gk.APIs {
 		stripedPath := strings.Split(cmd, "#")[0]
 		apiGroup.Handle(v.HTTPMethod, stripedPath, v.Handler)
 		c := kingpin.Command(cmd, v.Help)
 		payloads[cmd] = c.Arg("payload", "").Default("").String()
 	}
 
-	cmd  := kingpin.Parse()
+	cmd := kingpin.Parse()
 	switch cmd {
 	case "start/server":
 		// start gin server
-		gk.ListenAndServe(router)
+		gk.Start(router)
 	default:
 		// process command line
 		UnderCommandLine = true
 
-		handler, exist := gk.APIHandlers[cmd]
+		handler, exist := gk.APIs[cmd]
 		if !exist {
 			if gk.Fallback != nil {
 				gk.Fallback(cmd)
@@ -88,7 +88,7 @@ func (gk *GinKin) Run(router *gin.Engine, relativePath string, middleware ...gin
 				buf = bytes.NewReader([]byte(*payload))
 			}
 		}
-		req, err := http.NewRequest(handler.HTTPMethod, relativePath + cmd, buf)
+		req, err := http.NewRequest(handler.HTTPMethod, relativePath+cmd, buf)
 		if err != nil {
 			log.Fatalln("fail to create request", err)
 		}
